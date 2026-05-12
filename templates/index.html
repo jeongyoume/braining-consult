@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>브레이닝 상담 멘트 생성기</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">BRAINING</div>
+      <h1>상담 준비 멘트 생성기</h1>
+      <p>아이 정보를 입력하면 C.A.R.E 모델에 맞는 상담 멘트를 자동으로 만들어드려요.</p>
+      <button class="history-toggle-btn" id="historyToggleBtn" onclick="toggleHistory()">
+        📋 상담 기록 보기
+      </button>
+    </header>
+
+    <!-- 히스토리 패널 -->
+    <section class="history-panel" id="historyPanel" style="display:none">
+      <div class="history-header">
+        <h2>상담 기록</h2>
+        <button class="clear-btn" onclick="clearHistory()">전체 삭제</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <main>
+      <section class="form-section">
+        <form id="consultForm">
+
+          <div class="section-title">기본 정보</div>
+          <div class="form-row three-col">
+            <div class="form-group">
+              <label for="child_name">아이 이름 <span class="required">*</span></label>
+              <input type="text" id="child_name" placeholder="예: 이래아" required />
+            </div>
+            <div class="form-group">
+              <label for="child_age">나이 <span class="required">*</span></label>
+              <input type="number" id="child_age" placeholder="예: 6" min="3" max="15" required />
+            </div>
+            <div class="form-group">
+              <label for="parent_name">학부모 성함 <span class="required">*</span></label>
+              <input type="text" id="parent_name" placeholder="예: 김희정" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="parent_type">학부모 유형 <span class="required">*</span></label>
+            <div class="select-wrapper">
+              <select id="parent_type" required>
+                <option value="">유형을 선택해주세요</option>
+                <option value="비교형">비교형 — "우리 아이만 뒤처지는 건 아닐까?"</option>
+                <option value="성과조급형">성과조급형 — "언제쯤 변화가 보이나요?"</option>
+                <option value="정보탐색형">정보탐색형 — 다른 학원·방법 언급이 잦음</option>
+                <option value="감정우선형">감정우선형 — 아이 표정·즐거움을 먼저 물음</option>
+                <option value="무관심형">무관심형 — 짧게 끊으려 함</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="section-title">아이 데이터</div>
+
+          <div class="form-group">
+            <label for="episode">
+              수업 에피소드 <span class="required">*</span>
+              <span class="hint">최근 3~4주 수업에서 기억에 남는 장면 (직접 발언 포함)</span>
+            </label>
+            <textarea id="episode" rows="4" placeholder="언제 + 어떤 활동에서 + 아이가 무엇을 했는가" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="writing_change">
+              글쓰기 변화
+              <span class="hint">전/후 비교 — 분량, 구조, 사고 깊이</span>
+            </label>
+            <textarea id="writing_change" rows="3" placeholder="예: 3개월 전엔 3줄이었는데 지금은 8줄, 문장을 나열하던 것에서 끊어 쓰기 시작"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="attitude_change">
+              태도·습관 변화
+              <span class="hint">집중도, 질문 빈도, 틀렸을 때 반응, 관계 변화 등</span>
+            </label>
+            <textarea id="attitude_change" rows="3" placeholder="예: 처음엔 말이 없었는데 이제는 친구에게 먼저 말을 건넴"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="curriculum">현재 커리큘럼 위치 <span class="required">*</span></label>
+            <textarea id="curriculum" rows="2" placeholder="예: 주장-이유 구조 완성 단계, 문장 어미 다/요 마무리 지도 중" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="followup">
+              이전 상담 팔로업 / 학부모 목표
+              <span class="hint">지난 상담 걱정, 약속했던 것, 학부모가 원하는 것</span>
+            </label>
+            <textarea id="followup" rows="2" placeholder="예: 깊이 있는 사고와 표현을 목적으로 보냄 / 지난번에 글쓰기 싫어한다고 걱정하심"></textarea>
+          </div>
+
+          <button type="submit" id="submitBtn">
+            <span class="btn-icon">✦</span>
+            <span class="btn-text">상담 멘트 생성하기</span>
+          </button>
+        </form>
+      </section>
+
+      <section class="result-section" id="resultSection" style="display:none">
+        <div class="result-header">
+          <h2>생성된 상담 멘트</h2>
+          <button id="copyBtn" onclick="copyResult()">복사하기</button>
+        </div>
+        <div id="resultContent" class="result-content"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 히스토리 상세 모달 -->
+  <div id="historyModal" class="modal-overlay" style="display:none" onclick="closeModal(event)">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalTitle"></h3>
+        <div class="modal-actions">
+          <button onclick="copyModal()">복사하기</button>
+          <button class="close-btn" onclick="document.getElementById('historyModal').style.display='none'">✕</button>
+        </div>
+      </div>
+      <div id="modalContent" class="result-content"></div>
+    </div>
+  </div>
+
+  <div id="loadingOverlay" class="loading-overlay" style="display:none">
+    <div class="loading-box">
+      <div class="spinner"></div>
+      <p>멘트를 생성하고 있어요...</p>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
